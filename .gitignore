@@ -6,6 +6,11 @@ __pycache__/
 # C extensions
 *.so
 
+# Jupyter
+*.DS_Store
+*data/.DS_Store
+
+
 # Distribution / packaging
 .Python
 build/
