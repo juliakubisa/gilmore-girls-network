@@ -19,24 +19,24 @@ import matplotlib.pyplot as plt
 # from pyvis.network import Network
 # import community.community_louvain as cl
 
-
-# Load datasets
-characters = pd.read_csv("data/characters_info.csv", sep='\t') # List of characters
-script = pd.read_csv("data/Gilmore_Girls_Lines.csv", sep=',')
-
 # Import stopwords
 # stop_words = stopwords.words('english')
 # stop_words.extend(["uh","oh","okay","im","dont", "know", "yeah", "thats", "youre", "well", "what", "ok", "isnt", "dont",
 #                   "yes", "no", "theres", "cant", "didnt", "whats"])
 
 
+def compute_basic_analytics(script, characters):
+    total_seasons = int(script['Season'].max())
+    total_episodes = int(characters['num_episodes'].max())
+    total_characters = int(characters['name'].count())
+    total_lines = int(script['Line'].count())
+    return total_episodes, total_characters, total_lines, total_seasons
+
 def count_lines_by_character(script):
     char_lines = (script.groupby(['Character'], as_index=False)['Line']
                   .count().sort_values(['Line'], ascending=False))
     char_lines['Percent'] = char_lines['Line'] / char_lines['Line'].sum()
     return char_lines
-
-print(count_lines_by_character(script))
 
 def num_characters_per_season(script):
     seasons_char = (script.groupby(['Season'], as_index=False)['Character']
