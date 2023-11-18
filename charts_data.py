@@ -2,27 +2,26 @@
 import pandas as pd
 import numpy as np
 
-# Data visualisation
+# Visualization
 import matplotlib.pyplot as plt
-# %matplotlib inline
 
 # NLP
-# import nltk
-# from nltk.corpus import stopwords
-# # from wordcloud import WordCloud
-# import re
-# import collections
+import nltk
+from nltk.corpus import stopwords
+# from wordcloud import WordCloud
+import re
+import collections
 
 # Network
-# import pyvis
-# import networkx as nx
-# from pyvis.network import Network
-# import community.community_louvain as cl
+import pyvis
+import networkx as nx
+from pyvis.network import Network
+import community.community_louvain as cl
 
 # Import stopwords
-# stop_words = stopwords.words('english')
-# stop_words.extend(["uh","oh","okay","im","dont", "know", "yeah", "thats", "youre", "well", "what", "ok", "isnt", "dont",
-#                   "yes", "no", "theres", "cant", "didnt", "whats"])
+stop_words = stopwords.words('english')
+stop_words.extend(["uh","oh","okay","im","dont", "know", "yeah", "thats", "youre", "well", "what", "ok", "isnt", "dont",
+                  "yes", "no", "theres", "cant", "didnt", "whats"])
 
 
 def compute_basic_analytics(script, characters):
@@ -42,7 +41,6 @@ def num_characters_per_season(script):
     seasons_char = (script.groupby(['Season'], as_index=False)['Character']
                     .nunique().sort_values('Character', ascending=False))
     return seasons_char
-
 
 def num_lines_per_season(script):
     count_lines = (script.groupby(['Season'], as_index=False)['Line']
@@ -70,10 +68,11 @@ def generate_wordcloud(text):
     plt.figure(figsize=(12,12))
     plt.imshow(word_cloud)
 
-def prepare_network_data(script):
-    input = 23041
+def prepare_network_data(script, characters):
+    input = 23338
     output = list(range(input + 1))
     scenes = list(np.repeat(output, 5))
+    script = script[7:]
     script['Scene'] = scenes[5:]  # Add number of a scene to column
 
     char_dict = {}
@@ -137,6 +136,8 @@ def build_network(network_df):
                                 edge_attr="Count",
                                 create_using=nx.Graph())
     communities = cl.best_partition(G)
+    # node_degree = nx.betweenness_centrality(G)
+    node_degree = dict(G.degree)
 
     # Set attribute by the community
     nx.set_node_attributes(G, communities, 'group')
@@ -145,10 +146,12 @@ def build_network(network_df):
     nx.set_node_attributes(G, node_degree, 'size')
 
     # Create a graph
-    net = Network(notebook=True, width="1200px", height="700px", bgcolor='#222222', font_color='white')
-    node_degree = dict(G.degree)
+    net = Network(notebook=True, width="1200px", height="700px", bgcolor='#FFFFFF', font_color='black')
     net.from_nx(G)
-    net.show("gilmore.html")
+    net.save_graph('GilmoreGirlsNetwork.html')
+    HtmlFile = open('GilmoreGirlsNetwork.html', 'r', encoding='utf-8')
+    return HtmlFile
+    # net.show("gilmore.html")
 
 
 
