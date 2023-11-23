@@ -64,9 +64,10 @@ def clean_data(character_lines):
     return text
 
 def generate_wordcloud(text):
-    word_cloud= WordCloud(width=1920,height=1080, background_color="white", colormap='tab20b', collocations=False).generate(text)
+    word_cloud  = WordCloud(width=1920,height=1080, background_color="white", colormap='tab20b', collocations=False).generate(text)
     plt.figure(figsize=(12,12))
     plt.imshow(word_cloud)
+
 
 def prepare_network_data(script, characters):
     input = 23338
@@ -146,7 +147,7 @@ def build_network(network_df):
     nx.set_node_attributes(G, node_degree, 'size')
 
     # Create a graph
-    net = Network(notebook=True, width="1200px", height="700px", bgcolor='#FFFFFF', font_color='black')
+    net = Network(notebook=False, width="800px", height="700px", bgcolor='#FFFFFF', font_color='black')
     net.from_nx(G)
     net.save_graph('GilmoreGirlsNetwork.html')
     HtmlFile = open('GilmoreGirlsNetwork.html', 'r', encoding='utf-8')
