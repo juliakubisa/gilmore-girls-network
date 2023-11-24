@@ -6,21 +6,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # NLP
-import nltk
 from nltk.corpus import stopwords
 # from wordcloud import WordCloud
 import re
 import collections
 
 # Network
-import pyvis
 import networkx as nx
 from pyvis.network import Network
 import community.community_louvain as cl
 
 # Import stopwords
 stop_words = stopwords.words('english')
-stop_words.extend(["uh","oh","okay","im","dont", "know", "yeah", "thats", "youre", "well", "what", "ok", "isnt", "dont",
+stop_words.extend(["uh", "oh", "okay", "im", "dont", "know", "yeah", "thats", "youre", "well", "what", "ok", "isnt", "dont",
                   "yes", "no", "theres", "cant", "didnt", "whats"])
 
 
@@ -31,16 +29,19 @@ def compute_basic_analytics(script, characters):
     total_lines = int(script['Line'].count())
     return total_episodes, total_characters, total_lines, total_seasons
 
+
 def count_lines_by_character(script):
     char_lines = (script.groupby(['Character'], as_index=False)['Line']
                   .count().sort_values(['Line'], ascending=False))
     char_lines['Percent'] = char_lines['Line'] / char_lines['Line'].sum()
     return char_lines
 
+
 def num_characters_per_season(script):
     seasons_char = (script.groupby(['Season'], as_index=False)['Character']
                     .nunique().sort_values('Character', ascending=False))
     return seasons_char
+
 
 def num_lines_per_season(script):
     count_lines = (script.groupby(['Season'], as_index=False)['Line']
@@ -48,24 +49,46 @@ def num_lines_per_season(script):
     return count_lines
 
 
-def extract_character_lines(character, script):
-    character_lines = script[script['Character'] == character].reset_index(drop=True)
+def extract_character_lines(character_name, script):
+    character_lines = script[script['Character'] == character_name].reset_index(drop=True)
     character_lines = character_lines['Line']
     return character_lines
 
 
 def clean_data(character_lines):
-    data = " ".join(character_lines) # Join the text
-    data = re.sub(r'[^\w\s]', '', data) # Delete unwanted characters
+    data = " ".join(character_lines)  # Join the text
+    data = re.sub(r'[^\w\s]', '', data)  # Delete unwanted characters
     tokens = data.split()
-    tokens = [word.lower() for word in tokens] # Lower all the letters
-    tokens = [word for word in tokens if not word in stop_words] # Ignore stopwords
-    text = " ".join(tokens) # Create one joined sentence
+    tokens = [word.lower() for word in tokens]  # Lower all the letters
+    tokens = [word for word in tokens if not word in stop_words]  # Ignore stopwords
+    text = " ".join(tokens)  # Create one joined sentence
     return text
 
+
+def word_count(text):
+    # Create an empty dictionary named 'counts' to store word frequencies.
+    counts = dict()
+
+    # Split the input string 'str' into a list of words using spaces as separators and store it in the 'words' list.
+    words = text.split()
+
+    # Iterate through each word in the 'words' list.
+    for word in words:
+        # Check if the word is already in the 'counts' dictionary.
+        if word in counts:
+            # If the word is already in the dictionary, increment its frequency by 1.
+            counts[word] += 1
+        else:
+            # If the word is not in the dictionary, add it to the dictionary with a frequency of 1.
+            counts[word] = 1
+    # Return the 'counts' dictionary, which contains word frequencies.
+    return counts
+
+
 def generate_wordcloud(text):
-    word_cloud  = WordCloud(width=1920,height=1080, background_color="white", colormap='tab20b', collocations=False).generate(text)
-    plt.figure(figsize=(12,12))
+    word_cloud = WordCloud(width=1920, height=1080, background_color="white",
+                           colormap='tab20b', collocations=False).generate(text)
+    plt.figure(figsize=(12, 12))
     plt.imshow(word_cloud)
 
 
@@ -147,12 +170,32 @@ def build_network(network_df):
     nx.set_node_attributes(G, node_degree, 'size')
 
     # Create a graph
-    net = Network(notebook=False, width="800px", height="700px", bgcolor='#FFFFFF', font_color='black')
+    net = Network(notebook=False, width="1000px", height="900px", bgcolor='white', font_color='black')
     net.from_nx(G)
     net.save_graph('GilmoreGirlsNetwork.html')
-    HtmlFile = open('GilmoreGirlsNetwork.html', 'r', encoding='utf-8')
-    return HtmlFile
-    # net.show("gilmore.html")
+    HtmlFile = open('GilmoreGirlsNetwork.html', 'r', encoding='utf-8').read()
+    HtmlFile = HtmlFile.replace('border: 1px solid lightgray;', '')
+    return G, HtmlFile
 
 
+def centralities_charts(G):
+    # Degree centrality
+    degree_dict = nx.degree_centrality(G)
+    degree_df = (pd.DataFrame(degree_dict.items(), columns=['name', 'centrality'])
+                 .sort_values(['centrality'], ascending=False))
 
+    # Betweenness centrality
+    beetweenness_dict = nx.betweenness_centrality(G)
+    beetweenness_df = (pd.DataFrame(beetweenness_dict.items(), columns=['name', 'centrality'])
+                       .sort_values(['centrality'], ascending=False))
+
+    # Closeness centrality
+    closeness_dict = nx.closeness_centrality(G)
+    closeness_df = (pd.DataFrame(closeness_dict.items(), columns=['name', 'centrality'])
+                    .sort_values(['centrality'], ascending=False))
+
+    # Eigenvector centrality
+    eigenvector_dict = nx.eigenvector_centrality(G)
+    eigenvector_df = (pd.DataFrame(eigenvector_dict.items(), columns=['name', 'centrality'])
+                      .sort_values(['centrality'], ascending=False))
+    return degree_df, beetweenness_df, closeness_df, eigenvector_df
