@@ -2,15 +2,10 @@
 import pandas as pd
 import numpy as np
 
-# Visualization
-import matplotlib.pyplot as plt
-
 # NLP
-# from nltk.corpus import stopwords
 import nltk
 from wordcloud import WordCloud
 import re
-import collections
 
 # Network
 import networkx as nx
