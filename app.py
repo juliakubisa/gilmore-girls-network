@@ -4,6 +4,7 @@ import pandas as pd
 import plotly.express as px
 import streamlit.components.v1 as components
 from streamlit_option_menu import option_menu
+import matplotlib.pyplot as plt
 st.set_page_config(page_title="Gilmore Girls Dasboard", layout="wide")
 
 
@@ -110,9 +111,17 @@ def network():
         st.plotly_chart(barplot6, theme="streamlit", use_container_width=True)
 
 def wordcloud():
-    lines = charts_data.extract_character_lines('Lorelai', script)
+    st.title('Wordcloud of the most used words')
+    character_name = st.selectbox('select a character', ['Lorelai', 'Rory', 'Emily', 'Lane', 'Sookie'])
+    st.divider()
+
+    lines = charts_data.extract_character_lines(character_name, script)
     text = charts_data.clean_data(lines)
-    res = charts_data.word_count(text)
+    word_cloud = charts_data.generate_wordcloud(text)
+    fig, ax = plt.subplots(figsize=(12, 12))
+    ax.imshow(word_cloud)
+    plt.axis("off")
+    st.pyplot(fig)
 
 
 # Add sidebar

@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 # NLP
 from nltk.corpus import stopwords
-# from wordcloud import WordCloud
+from wordcloud import WordCloud
 import re
 import collections
 
@@ -88,8 +88,7 @@ def word_count(text):
 def generate_wordcloud(text):
     word_cloud = WordCloud(width=1920, height=1080, background_color="white",
                            colormap='tab20b', collocations=False).generate(text)
-    plt.figure(figsize=(12, 12))
-    plt.imshow(word_cloud)
+    return word_cloud
 
 
 def prepare_network_data(script, characters):
