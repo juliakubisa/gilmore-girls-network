@@ -6,7 +6,8 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 # NLP
-from nltk.corpus import stopwords
+# from nltk.corpus import stopwords
+import nltk
 from wordcloud import WordCloud
 import re
 import collections
@@ -17,7 +18,8 @@ from pyvis.network import Network
 import community.community_louvain as cl
 
 # Import stopwords
-stop_words = stopwords.words('english')
+nltk.download('stopwords')
+stop_words = nltk.corpus.stopwords.words('english')
 stop_words.extend(["uh", "oh", "okay", "im", "dont", "know", "yeah", "thats", "youre", "well", "what", "ok", "isnt", "dont",
                   "yes", "no", "theres", "cant", "didnt", "whats"])
 
